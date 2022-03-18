@@ -2,8 +2,9 @@ import React, { useState } from "react";
 
 // slider module import
 import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore, { Navigation, Pagination } from "swiper";
-import { my as ana } from "./mycode";
+import SwiperCore, { Navigation, Pagination, Manipulation } from "swiper";
+import { my as ana } from "./slider-helper/sliderCore";
+import { settings } from "./slider-helper/sliderUtils";
 import "swiper/css/navigation";
 
 //image import
@@ -19,84 +20,54 @@ import img9 from "./images/9.jpg";
 import img10 from "./images/10.jpg";
 
 //slider module use
-SwiperCore.use([Navigation, Pagination]);
+SwiperCore.use([Navigation, Pagination, Manipulation]);
+
+//this image source will come from your api
+const imageFromApi = [
+  "https://unsplash.com/photos/g-krQzQo9mI/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHwyfHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
+  "https://unsplash.com/photos/mOEqOtmuPG8/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHw0fHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
+  "https://unsplash.com/photos/Q6UehpkBSnQ/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHw1fHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
+];
 
 function App() {
   const list = [img1, img2, img3, img4, img5, img6, img7, img8, img9, img10];
-
-  //call api
   const [imageList, setImageList] = useState(list);
 
+  const [swiperRef, setSwiperRef] = useState(null);
   const loadImage = async () => {
-    alert("Loading new image, same image load from api..")
+    alert("Loading new image, same image load from api..");
     //call api here
-    const imageFromApi = [
-      "https://unsplash.com/photos/g-krQzQo9mI/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHwyfHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
-      "https://unsplash.com/photos/mOEqOtmuPG8/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHw0fHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
-      "https://unsplash.com/photos/Q6UehpkBSnQ/download?ixid=MnwzMTEwNzF8MHwxfHNlYXJjaHw1fHxsb25kb258ZW58MHx8fHwxNjQ3NTM3MjM1",
-    ];
-
     setImageList([...imageList, ...imageFromApi]);
+  };
+
+  const addpend = () => {
+    //call api here
+    alert("Loading new image, same image load from api..");
+    const appendedList = [];
+    for (let i = 0; i < imageFromApi.length; i++) {
+      appendedList.push(
+        `<div class="swiper-slide"> <img class='slide-image' src= ${imageFromApi[i]} /> </div>`
+      );
+    }
+    swiperRef.prependSlide(appendedList);
   };
 
   return (
     <div className="my-slider-wrapper">
       <Swiper
-        effect={"panorama"}
-        onSlideChange={(swiper) =>
-          // swiper.isEnd ? loadImage() : "Image avaible"
-          swiper.isEnd ? loadImage() : console.log(swiper.isEnd)
-          // 
-        }
-        // loop={!0}
-        // loopedSlides={10}
-        // centeredSlides={!0}
-        grabCursor={!0}
+        {...settings}
+        onSlideChange={(swiper) => (swiper.isBeginning ? addpend() : null)}
+        onReachEnd={() => loadImage()}
+        onSwiper={(swiper) => setSwiperRef(swiper)}
         modules={[ana, Pagination]}
         className="mySwiper panorama-slider"
-        navigation={true}
-        panorama={{
-          depth: 150,
-          rotate: 45,
-        }}
-        slidesPerView={1.5}
-        breakpoints={{
-          480: {
-            slidesPerView: 2,
-            panorama: {
-              rotate: 35,
-              depth: 150,
-            },
-          },
-          640: {
-            slidesPerView: 3,
-            panorama: {
-              rotate: 30,
-              depth: 150,
-            },
-          },
-          1024: {
-            slidesPerView: 4,
-            panorama: {
-              rotate: 30,
-              depth: 200,
-            },
-          },
-          1200: {
-            slidesPerView: 5,
-            panorama: {
-              rotate: 25,
-              depth: 250,
-            },
-          },
-        }}
       >
         <div className="swiper">
           {imageList.map((data, index) => (
             <SwiperSlide key={index}>
-              <img className="slide-image" src={data} />
+              <img className="slide-image" src={data} alt="" />
             </SwiperSlide>
-          ))}{" "}
+          ))}
         </div>
       </Swiper>
     </div>
